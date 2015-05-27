@@ -29,6 +29,8 @@ Flags:
        smoothing parameter (integer). Minimum is 0. 
     -nosave
        results will not be saved to file.
+    -csv
+       results will be saved to a csv file (default is tsv).
     -noprint
        results will not be printed on screen.
     -help
