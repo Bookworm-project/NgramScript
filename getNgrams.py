@@ -80,13 +80,13 @@ def getNgrams(query, corpus, startYear, endYear, smoothing):
 	response = urllib.urlopen( url ).read()
 	
 	timeseries = extractCleanTerms("\"timeseries\": \[.*?\]",["\"timeseries\": \[","\]"],response)
-	terms_searched = extractCleanTerms("\{\"ngram\": \".*?\"",["\{\"ngram\": \"","\""],response)
+	termsSearched = extractCleanTerms("\{\"ngram\": \".*?\"",["\{\"ngram\": \"","\""],response)
 	
-	terms_to_timeseries = {}
-	for index in range(len(terms_searched)):
-		terms_to_timeseries[terms_searched[index]] = [float(time) for time in timeseries[index].split(",")]
+	termsToTimeseries = {}
+	for index in range(len(termsSearched)):
+		termsToTimeseries[termsSearched[index]] = [float(time) for time in timeseries[index].split(",")]
 
-	return url, urlquery, terms_to_timeseries
+	return url, urlquery, termsToTimeseries
 
 
 
