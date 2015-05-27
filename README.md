@@ -1,15 +1,6 @@
 # NgramScript
 
-Created by JB Michel for the Harvard Cultural Observatory
-
-Oct 19 2012 www.culturomics.org, @culturomics, @jb_michel
-
-Modified by M Shamim for the Rice Cultural Observatory
-
-May 27, 2015 www.culturomics.org, @theaidenlab
-
-
-This is a basic python code to retrieve data behind trajectories plotted on the Google Books Ngram Viewer: books.google.com/ngrams. Just type exactly the same string you would have type on books.google.com/ngrams, and retrieve the data in tsv format. By default, data is printed on screen and saved to file in the current directory.
+Basic python code to retrieve data behind trajectories plotted on the Google Books Ngram Viewer: books.google.com/ngrams. Just type exactly the same string you would have type on books.google.com/ngrams, and retrieve the data in tsv format. By default, data is printed on screen and saved to file in the current directory.
 
 Note to savvy users: 
 
@@ -57,3 +48,9 @@ PLEASE do respect the terms of service of the Google Books Ngram Viewer while us
 This code is not a Google product and is not endorsed by Google in any way. 
 
 With this in mind... happy plotting!
+
+Created by JB Michel for the Harvard Cultural Observatory<br>
+Oct 19 2012 www.culturomics.org, @culturomics, @jb_michel
+
+Modified by M Shamim for the Rice Cultural Observatory<br>
+May 27, 2015 www.culturomics.org, @theaidenlab
