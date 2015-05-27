@@ -1,0 +1,2 @@
+# NgramScript
+Retrieve Ngram Queries
