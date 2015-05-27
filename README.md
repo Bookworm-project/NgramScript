@@ -8,6 +8,7 @@ Modified by M Shamim for the Rice Cultural Observatory, May 27, 2015 www.culturo
 This is a basic python code to retrieve data behind trajectories plotted on the Google Books Ngram Viewer: books.google.com/ngrams. Just type exactly the same string you would have type on books.google.com/ngrams, and retrieve the data in tsv format. By default, data is printed on screen and saved to file in the current directory.
 
 Note to savvy users: 
+
 1. you can directly pass queries as arguments to the python script, such as "python getNgrams.py awesome" or "getNgrams.exe great". 
 2. if you pass the '-quit' flag as an argument, the program will run once and quit without asking for more input, such as "python getNgrams.py awesome, sauce -quit". 	
 3. Known caveat: quotation marks are removed from the input query. 
