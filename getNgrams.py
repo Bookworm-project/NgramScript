@@ -89,16 +89,37 @@ def getNgrams(query, corpus, startYear, endYear, smoothing):
 	return url, urlquery, termsToTimeseries
 
 
+def reOrganizeDataByYear(data, startYear, endYear):
 
-def saveData(fname, data, url, outputAsTSV):
+	terms = data.keys()
+	sortedData = {}
+
+	for i in range(endYear-startYear+1):
+		values = []
+		for term in terms:
+			values.append(data[term][i])
+		sortedData[startYear+i] = values
+
+	return terms, sortedData
+
+
+def saveData(fname, data, url, outputAsTSV, startYear, endYear):
 	# write to csv first (can't directly write using tab delimeters with csvwriter)
 	# then convert to tsv and delete the csv file
+
+	terms, resortedData = reOrganizeDataByYear(data, startYear, endYear)
 	
 	outputFile = open(fname+".csv", 'w')
 	writer = csv.writer(outputFile)
 	writer.writerow([url])
-	for key, value in data.items():
-		writer.writerow([key] + value)
+	writer.writerow(["year"]+terms)
+
+	for year in range(startYear,endYear+1):
+		writer.writerow([year] + resortedData[year])
+
+
+	#for key, value in data.items():
+	#	writer.writerow([key] + value)
 	outputFile.close()
 
 	if(outputAsTSV):
@@ -145,7 +166,7 @@ def runQuery(argumentString):
 			print data
 		if toSave:
 			filename='%s-%s-%d-%d-%d'%(urlquery,corpus,startYear,endYear,smoothing)
-			saveData(filename,data,url,toTSV)
+			saveData(filename,data,url,toTSV, startYear, endYear)
 			print 'Data saved to %s'%filename
 
 if __name__ == '__main__':
@@ -156,8 +177,8 @@ if __name__ == '__main__':
 	if argumentString=='':
 		argumentString = raw_input("Please enter an ngram query (or -help, or -quit):")
 	while '-quit' not in argumentString.split():
-		try:
-			runQuery(argumentString)
-		except:
-			print 'An error occurred.'
+		#try:
+		runQuery(argumentString)
+		#except:
+		#	print 'An error occurred.'
 		argumentString = raw_input("Please enter an ngram query (or -help, or -quit):")		
