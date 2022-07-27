@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import urllib,re,sys,csv,os
+import urllib.parse
+import urllib.request
 
 INFO="""
 Python code to retrieve data behind trajectories plotted on the Google Books Ngram Viewer: books.google.com/ngrams.
@@ -20,12 +22,12 @@ Example usage:
   -quit
  	
 Flags:
-  -corpus=CORPUS [default: eng_2012]
+  -corpus=CORPUS [default: eng_2019]
      this will run the query in CORPUS. Possible values are  
      recapitulated below, and here http://books.google.com/ngrams/info.  
-  -startYear=YEAR [default: 1800]
+  -startYear=YEAR [default: 1500]
      start the query in YEAR (integer). 
-  -endYear=YEAR [default: 2000]
+  -endYear=YEAR [default: 2019]
      ends the query in YEAR (integer).
   -smoothing=SMOOTHING [default: 3]
      smoothing parameter (integer). Minimum is 0. 
@@ -41,10 +43,10 @@ Flags:
      quits. 
 
 Possible corpora:
-  eng_2012, eng_2009, eng_us_2012, eng_us_2009, eng_gb_2012, eng_gb_2009, 
-  chi_sim_2012, chi_sim_2009, fre_2012, fre_2009, ger_2012, ger_2009,
-  spa_2012, spa_2009, rus_2012, rus_2009, heb_2012, heb_2009, ita_2012,	
-  eng_fiction_2012, eng_fiction_2009, eng_1m_2009
+  eng_2019,eng_2012, eng_2009, eng_us_2019, eng_us_2012, eng_us_2009, eng_gb_2019, eng_gb_2012, eng_gb_2009, 
+  chi_sim_2019, chi_sim_2012, chi_sim_2009, fre_2019, fre_2012, fre_2009, ger_2019, ger_2012, ger_2009,
+  spa_2019, spa_2012, spa_2009, rus_2019, rus_2012, rus_2009, heb_2019, heb_2012, heb_2009, ita_2019, ita_2012,	
+  eng_fiction_2019, eng_fiction_2012, eng_fiction_2009, eng_1m_2009
 
 PLEASE do respect the terms of service of the Google Books Ngram Viewer while using this code.
 This code is meant to help viewers retrieve data behind a few queries, not bang at Google's  servers with thousands of queries.
@@ -58,13 +60,15 @@ With this in mind... happy plotting!
 corpora={'eng_us_2012':17, 'eng_us_2009':5, 'eng_gb_2012':18, 'eng_gb_2009':6, 
 	'chi_sim_2012':23, 'chi_sim_2009':11,'eng_2012':15, 'eng_2009':0,
 	'eng_fiction_2012':16, 'eng_fiction_2009':4, 'eng_1m_2009':1, 'fre_2012':19, 'fre_2009':7, 
-	'ger_2012':20, 'ger_2009':8, 'heb_2012':24, 'heb_2009':9, 
-	'spa_2012':21, 'spa_2009':10, 'rus_2012':25, 'rus_2009':12, 'ita_2012':22}
+	'ger_2012':20, 'ger_2012':20, 'ger_2009':8, 'heb_2012':24, 'heb_2009':9,
+	'spa_2012':21, 'spa_2009':10, 'rus_2012':25, 'rus_2009':12, 'ita_2012':22,
+	'eng_2019':26, 'eng_us_2019':28, 'eng_gb_2019':29, 'eng_fiction_2019':27, 'chi_sim_2019':34,
+	'fre_2019':30, 'ger_2019':31, 'heb_2019':35, 'spa_2019':32, 'rus_2019':36, 'ita_2019':33}
 
 
 def extractCleanTerms(regExpression, filterTerms, fullText):
 
-	foundSections=re.findall(regExpression, fullText)
+	foundSections=re.findall(regExpression, fullText.decode('utf-8'))
 
 	for index in range(len(foundSections)):
 		for filterTerm in filterTerms:
@@ -74,10 +78,10 @@ def extractCleanTerms(regExpression, filterTerms, fullText):
 
 
 def getNgrams(query, corpus, startYear, endYear, smoothing):
-	urlquery = urllib.quote_plus(query, safe='"')
+	urlquery = urllib.parse.quote_plus(query, safe='"')
 	corpusNumber=corpora[corpus]
-	url = 'http://books.google.com/ngrams/graph?content=%s&year_start=%d&year_end=%d&corpus=%d&smoothing=%d&share='%(urlquery,startYear,endYear,corpusNumber,smoothing)
-	response = urllib.urlopen( url ).read()
+	url = 'http://books.google.com/ngrams/graph?content=%s&year_start=%d&year_end=%d&corpus=%d&smoothing=%d'%(urlquery,startYear,endYear,corpusNumber,smoothing)
+	response = urllib.request.urlopen( url ).read()
 	
 	timeseries = extractCleanTerms("\"timeseries\": \[.*?\]",["\"timeseries\": \[","\]"],response)
 	termsSearched = extractCleanTerms("\{\"ngram\": \".*?\"",["\{\"ngram\": \"","\""],response)
@@ -109,10 +113,10 @@ def saveData(fname, data, url, outputAsTSV, startYear, endYear):
 
 	terms, resortedData = reOrganizeDataByYear(data, startYear, endYear)
 	
-	outputFile = open(fname+".csv", 'w')
+	outputFile = open(fname+".csv", 'w',newline='')
 	writer = csv.writer(outputFile)
 	writer.writerow([url])
-	writer.writerow(["year"]+terms)
+	writer.writerow(["year"]+list(terms))
 
 	for year in range(startYear,endYear+1):
 		writer.writerow([year] + resortedData[year])
@@ -132,7 +136,7 @@ def runQuery(argumentString):
 	arguments = argumentString.split()
 	query = ' '.join([arg for arg in arguments if not arg.startswith('-')])
 	params = [arg for arg in arguments if arg.startswith('-')]
-	printHelp, toSave, toTSV, toPrint,corpus,startYear,endYear,smoothing=False, True, True, True, 'eng_2012',1800,2000,3
+	printHelp, toSave, toTSV, toPrint,corpus,startYear,endYear,smoothing=False, True, True, True, 'eng_2019',1500,2019,3
 	
 	# parsing the query parameters
 	for param in params:
@@ -155,19 +159,19 @@ def runQuery(argumentString):
 		elif '-quit' in param:
 			pass
 		else:
-			print 'Did not recognize the following argument:', param
+			print ('Did not recognize the following argument:', param)
 	
 	if printHelp:
-		print INFO
+		print (INFO)
 	else:			
 		url, urlquery,data = getNgrams(query, corpus, startYear, endYear, smoothing)
 		if toPrint:
-			print url
-			print data
+			print (url)
+			print (data)
 		if toSave:
-			filename='%s-%s-%d-%d-%d'%(urlquery,corpus,startYear,endYear,smoothing)
+			filename='%s：%d-%d（%s）'%(urlquery.replace('%2C',' '),startYear,endYear,corpus)
 			saveData(filename,data,url,toTSV, startYear, endYear)
-			print 'Data saved to %s'%filename
+			print ('Data saved to %s'%filename)
 
 if __name__ == '__main__':
 	argumentString = ' '.join(sys.argv[1:])
@@ -175,10 +179,10 @@ if __name__ == '__main__':
 		runQuery(argumentString)
 		
 	if argumentString=='':
-		argumentString = raw_input("Please enter an ngram query (or -help, or -quit):")
+		argumentString = input("Please enter an ngram query (or -help, or -quit):")
 	while '-quit' not in argumentString.split():
 		#try:
 		runQuery(argumentString)
 		#except:
 		#	print 'An error occurred.'
-		argumentString = raw_input("Please enter an ngram query (or -help, or -quit):")		
+		argumentString = input("Please enter an ngram query (or -help, or -quit):")
